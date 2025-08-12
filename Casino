@@ -1,0 +1,704 @@
+#include<bits/stdc++.h>
+#include<thread>
+#include<chrono>
+using namespace std;
+
+mt19937_64 rd(time(0));
+
+long long curMoney = 500000;
+long long realMoney = 500000;
+
+int randInt(int L, int R){
+    return L + rd() % (R - L + 1);
+}
+
+string formMoney(long long money){
+    if(money == 0) return "0 VND";
+    string result;
+
+    for(int i = 1; money > 0; i++){
+        result = char((money % 10) + '0') + result;
+        money /= 10;
+        if(i % 3 == 0 && money > 0) result = '.' + result;
+    }
+
+    result += " VND";
+
+    return result;
+}
+
+long long formMoney_to_Money(string money){
+    long long result = 0;
+
+    for(char i:money){
+        if(i >= '0' && i <= '9') result = result * 10 + int(i - '0');
+    }
+
+    if(money[0] == '-') result *= -1;
+
+    return result;
+}
+
+string moneyInput(){
+    string S;
+    cin >> S;
+    return S;
+}
+
+void printMoney(){
+    cout << "So tien trong game cua ban: " << formMoney(curMoney);
+    for(int i = 0; i < 5; i++) cout << ' '; cout << '|'; for(int i = 0; i < 5; i++) cout << ' ';
+    cout << "So tien trong tai khoan cua ban: " << formMoney(realMoney);
+    cout << endl << endl;
+}
+
+void print(){
+    system("cls");
+    cout << "An Q de ra ngoai man hinh chinh!" << endl;
+    for(int i = 0; i < 100; i++) cout << '_';
+    cout << endl;
+
+    printMoney();
+}
+
+void chooseNumber(){
+    cout << "Nhap game ban muon choi: " << endl;
+    cout << "1. App Ngan Hang" << endl;
+    cout << "2. Tai Xiu" << endl;
+    cout << "3. Jackpot" << endl;
+    cout << "4. B52" << endl;
+}
+
+void Sleep(double seconds) {
+    this_thread::sleep_for(chrono::duration<double>(seconds));
+}
+
+namespace Bank{
+    bool quitGame;
+    string money;
+    long long moneyInt;
+    char userOption;
+
+    void intro(){
+        for(int i = 0; i < 5; i++) cout << ' ';
+        cout << "Welcome to the best Bank!";
+        cout << endl;
+        cout << endl;
+    }
+
+    void Nap(){
+        quitGame = 0;
+        bool correctOption = 1;
+
+        while(1){
+            print();
+            if(!correctOption) cout << "Hay nap lai!" << endl;
+            cout << "Nhap so tien ban muon nap:" << endl;
+
+            money = moneyInput();
+            moneyInt = formMoney_to_Money(money);
+
+            if(money == "Q"){
+                quitGame = 1;
+                break;
+            }
+
+            if(moneyInt <= 0 || moneyInt > realMoney){
+                correctOption = 0;
+                continue;
+            }
+
+            curMoney += moneyInt;
+            realMoney -= moneyInt;
+            break;
+        }
+
+        if(quitGame) return;
+
+        for(int i = 0; i < 96; i++) cout << '_';
+        cout << endl;
+        cout << "Nap thanh cong: " << formMoney(moneyInt) << endl << endl;
+        printMoney();
+        cout << "Tu dong chuyen ve man hinh chinh sau 3s." << endl;
+        Sleep(3);
+    }
+
+    void Rut(){
+        quitGame = 0;
+        bool correctOption = 1;
+        while(1){
+            print();
+            if(!correctOption) cout << "Hay rut lai!" << endl;
+            cout << "Nhap so tien ban muon rut:" << endl;
+
+            money = moneyInput();
+            moneyInt = formMoney_to_Money(money);
+
+            if(money == "Q"){
+                quitGame = 1;
+                break;
+            }
+
+            if(moneyInt <= 0 || moneyInt > curMoney){
+                correctOption = 0;
+                continue;
+            }
+
+            curMoney -= moneyInt;
+            realMoney += moneyInt;
+            break;
+        }
+
+        if(quitGame) return;
+
+        for(int i = 0; i < 100; i++) cout << '_';
+        cout << endl;
+        cout << "Rut thanh cong: " << formMoney(moneyInt) << endl << endl;
+        printMoney();
+        cout << "Tu dong chuyen ve man hinh chinh sau 3s." << endl;
+        Sleep(3);
+    }
+
+    void GamePlay(){
+        print();
+        intro();
+
+        cout << "Hay lua chon chuc nang ban su dung:" << endl;
+        cout << "1. Nap Tien" << endl;
+        cout << "2. Rut Tien" << endl;
+
+        cin >> userOption;
+        if(userOption == 'Q') return;
+
+        if(userOption == '1') Nap();
+        else Rut();
+    }
+}
+
+namespace TaiXiu{
+    char userOption, curResult;
+    long long betInt;
+    int dice[3];
+    char scrDice[3];
+    bool quitGame;
+    string bet;
+
+    void intro(){
+        for(int i = 0; i < 5; i++) cout << ' ';
+        cout << "Welcome to the best casino game!";
+        cout << endl;
+        cout << endl;
+    }
+
+    void option(){
+        bool correctOption = 1;
+        while(1){
+            print();
+            if(!correctOption) cout << "Vui long chon dung!" << endl;
+
+            cout << "Hay lua chon T (Tai) hoac X (Xiu)" << endl;
+            cin >> userOption;
+
+            if(userOption == 'Q'){
+                quitGame = 1;
+                break;
+            }
+
+            if(userOption != 'T' && userOption != 'X'){
+                correctOption = 0;
+                continue;
+            }
+
+            correctOption = 1;
+
+            cout << "Hay dat cuoc: " << endl;
+
+            bet = moneyInput();
+            betInt = formMoney_to_Money(bet);
+
+            if(betInt <= 0 || betInt > curMoney){
+                correctOption = 0;
+                continue;
+            }
+
+            break;
+        }
+    }
+
+    int getResult(){
+        for(int i = 0; i < 3; i++) dice[i] = randInt(1, 6), scrDice[i] = 'X';
+
+        return dice[0] + dice[1] + dice[2];
+    }
+
+    void printRole(){
+        print();
+        cout << endl;
+        cout << "Lua chon cua ban: " << userOption << endl;
+        cout << "Muc cuoc: " << formMoney(betInt) << endl;
+        for(int i = 0; i < 5; i++) cout << ' ';
+        for(int i = 0; i < 14; i++) cout << '_';
+        cout << endl;
+
+        for(int i = 0; i < 5; i++) cout << ' ';
+        cout << '|';
+        for(int i = 0; i < 12; i++) cout << ' ';
+        cout << '|';
+        cout << endl;
+
+        for(int i = 0; i < 5; i++) cout << ' ';
+        cout << '|';
+        for(int i = 0; i < 12; i++){
+            if(i % 4 == 1) cout << scrDice[i/4];
+            else cout << ' ';
+        }
+        cout << '|';
+        cout << endl;
+
+        for(int i = 0; i < 5; i++) cout << ' ';
+        cout << '|';
+        for(int i = 0; i < 12; i++) cout << '_';
+        cout << '|';
+        cout << endl;
+
+        Sleep(0.5);
+    }
+
+    void printResult(){
+        cout << endl;
+        for(int i = 0; i < 3; i++){
+            scrDice[i] = char(dice[i] + '0');
+            printRole();
+        }
+        cout << endl;
+        cout << "Ket qua: " << dice[0] << ' ' << dice[1] << ' ' << dice[2] << endl;
+        cout << "Tong: " << dice[0] + dice[1] + dice[2] << ' ' << (dice[0] + dice[1] + dice[2] > 10 ? "Tai" : "Xiu") << endl;
+        cout << "Tien thang: " << (userOption == curResult ? "+" : "-") << (userOption == curResult ? formMoney(int(betInt * 0.95)) : formMoney(betInt)) << endl;
+    }
+
+    void updateMoney(){
+        if(userOption == curResult){
+            int getMoney = betInt * 0.95;
+            curMoney += getMoney;
+        }
+        else{
+            curMoney -= betInt;
+        }
+
+        cout << "Tu dong lam moi sau 3s." << endl;
+        Sleep(3);
+    }
+
+    void GamePlay(){
+        quitGame = 0;
+        while(1){
+            print();
+            intro();
+            option();
+            if(quitGame) break;
+            curResult = (getResult() > 10 ? 'T' : 'X');
+            printResult();
+            updateMoney();
+        }
+    }
+}
+
+namespace Jackpot{
+    bool quitGame, Skip;
+    long long betInt;
+    int Times = 0, roleInt, arr[5], cnt[10];
+    char scrArr[5];
+    string bet, role, isSkip;
+
+    void intro(){
+        for(int i = 0; i < 5; i++) cout << ' ';
+        cout << "Welcome to the Jackpot game!";
+        cout << endl;
+        cout << endl;
+    }
+
+    void option(){
+        bool correctOption = 1;
+
+        while(1){
+            print();
+            if(!correctOption) cout << "Hay lam lai!" << endl;
+
+            cout << "An Y de skip hoac N de binh thuong!" << endl;
+            isSkip = moneyInput();
+            if(isSkip == "Q"){
+                quitGame = 1;
+                break;
+            }
+            if(isSkip == "Y"){
+                Skip = 1;
+            }
+            else{
+                Skip = 0;
+            }
+
+            cout << "So lan quay: " << endl;
+            role = moneyInput();
+            roleInt = formMoney_to_Money(role);
+            if(role == "Q"){
+                quitGame = 1;
+                break;
+            }
+
+            cout << "So tien dat cuoc:" << endl;
+            bet = moneyInput();
+            betInt = formMoney_to_Money(bet);
+            if(bet == "Q"){
+                quitGame = 1;
+                break;
+            }
+            if(betInt <= 0 || betInt * roleInt > curMoney){
+                correctOption = 0;
+                continue;
+            }
+
+            curMoney -= betInt * roleInt;
+
+            break;
+        }
+    }
+
+    void printRole(){
+        print();
+        cout << endl;
+        cout << "Luot: " << Times << endl;
+        cout << "Muc cuoc: " << formMoney(betInt) << endl;
+        for(int i = 0; i < 5; i++) cout << ' ';
+        for(int i = 0; i < 22; i++) cout << '_';
+        cout << endl;
+
+        for(int i = 0; i < 5; i++) cout << ' ';
+        cout << '|';
+        for(int i = 0; i < 20; i++) cout << ' ';
+        cout << '|';
+        cout << endl;
+
+        for(int i = 0; i < 5; i++) cout << ' ';
+        cout << '|';
+        for(int i = 0; i < 20; i++){
+            if(i % 4 == 1) cout << scrArr[i/4];
+            else cout << ' ';
+        }
+        cout << '|';
+        cout << endl;
+
+        for(int i = 0; i < 5; i++) cout << ' ';
+        cout << '|';
+        for(int i = 0; i < 20; i++) cout << '_';
+        cout << '|';
+        cout << endl;
+
+        if(!Skip) Sleep(0.2);
+    }
+
+    long long getResult(){
+        int NguQuy = 0;
+        int Sanh = 0;
+        int TuQuy = 0;
+        int Sam = 0;
+        int Doi = 0;
+
+        for(int i = 0; i < 10; i++){
+            if(cnt[i] == 5) NguQuy = 1;
+        }
+
+        sort(arr, arr + 5);
+        for(int i = 0; i < 4; i++){
+            if(arr[i] + 1 == arr[i + 1]) Sanh = 1;
+            else{
+                Sanh = 0;
+                break;
+            }
+        }
+
+        for(int i = 0; i < 10; i++){
+            if(cnt[i] == 4) TuQuy = 1;
+        }
+
+        for(int i = 0; i < 10; i++){
+            if(cnt[i] == 3) Sam = 1;
+        }
+
+        for(int i = 0; i < 10; i++){
+            if(cnt[i] == 2) Doi++;
+        }
+
+        long long winMoney = 0;
+
+        cout << endl;
+
+        if(NguQuy){
+            cout << "No Hu!!!" << endl;
+            for(int i = 1; i <= 10; i++){
+                long long curWin = randInt(betInt * 25, betInt * 50);
+                cout << i << ". +" << formMoney(curWin) << endl;
+                winMoney += curWin;
+                Sleep(0.5);
+            }
+            cout << "Tong thang: +" << formMoney(winMoney) << endl;
+            return winMoney;
+        }
+
+        if(TuQuy){
+            winMoney = betInt * 188;
+            cout << "Tu Quy!" << endl;
+            cout << "Tong thang: +" << formMoney(winMoney) << endl;
+            return winMoney;
+        }
+
+        if(Sanh){
+            winMoney = betInt * 25;
+            cout << "Sanh Rong!" << endl;
+            cout << "Tong thang: +" << formMoney(winMoney) << endl;
+            return winMoney;
+        }
+
+        if(Sam && Doi){
+            winMoney = betInt * 10;
+            cout << "Tong thang: +" << formMoney(winMoney) << endl;
+            return winMoney;
+        }
+
+        if(Sam){
+            winMoney = betInt * 3.65;
+            cout << "Tong thang: +" << formMoney(winMoney) << endl;
+            return winMoney;
+        }
+
+        if(Doi == 2){
+            winMoney = betInt * 1.55;
+            cout << "Tong thang: +" << formMoney(winMoney) << endl;
+            return winMoney;
+        }
+
+        if(Doi == 1){
+            winMoney = betInt * 0.45;
+            cout << "Tong thang: +" << formMoney(winMoney) << endl;
+            return winMoney;
+        }
+
+        cout << "Tong thang: +" << formMoney(winMoney) << endl;
+        return winMoney;
+    }
+
+    void printResult(){
+        for(int i = 0; i < 5; i++){
+            arr[i] = randInt(0, 9);
+            scrArr[i] = 'X';
+            cnt[arr[i]]++;
+        }
+
+        for(int i = 0; i < 5; i++){
+            scrArr[i] = char(arr[i] + '0');
+            printRole();
+        }
+
+        long long winMoney = getResult();
+        curMoney += winMoney;
+
+        cout << "Tu dong lam moi sau 3s." << endl;
+        if(!Skip) Sleep(3);
+    }
+
+    void GamePlay(){
+        quitGame = 0;
+        Skip = 0;
+        while(1){
+            print();
+            intro();
+            option();
+            if(quitGame) break;
+
+            while(roleInt--){
+                Times++;
+                memset(cnt, 0, sizeof cnt);
+                printResult();
+            }
+        }
+    }
+}
+
+namespace B52{
+    bool quitGame;
+    double pause;
+    string bet;
+    long long betInt;
+    vector<double> vecPause;
+    int vecSize;
+
+    void intro(){
+        for(int i = 0; i < 5; i++) cout << ' ';
+        cout << "Welcome to the B52 game!";
+        cout << endl;
+        cout << endl;
+    }
+
+    void option(){
+        bool correctOption = 1;
+        while(1){
+            print();
+            if(!correctOption) cout << "Hay dat cuoc lai!" << endl;
+
+            cout << "So tien cuoc: " << endl;
+            bet = moneyInput();
+            betInt = formMoney_to_Money(bet);
+
+            if(bet == "Q"){
+                quitGame = 1;
+                break;
+            }
+
+            if(betInt <= 0 || betInt > curMoney){
+                correctOption = 0;
+                continue;
+            }
+
+            cout << "Hay chon muc dung lai: " << endl;
+            cin >> pause;
+
+            curMoney -= betInt;
+
+            break;
+        }
+    }
+
+    void getPause(){
+        for(int i = 1; i <= 1000; i++){
+            for(double j = 0; j <= 1; j += 0.01){
+                if(i <= 2){
+                    for(int k = 1; k <= 250; k++) vecPause.push_back((double) i + j);
+                }
+                else if(i <= 5){
+                    for(int k = 1; k <= 100; k++) vecPause.push_back((double) i + j);
+                }
+                else if(i <= 10){
+                    int rd = randInt(0, 100);
+                    if(rd <= 25) vecPause.push_back((double(i + j)));
+                }
+                else if(i <= 50){
+                    int rd = randInt(0, 100);
+                    if(rd <= 15) vecPause.push_back((double(i + j)));
+                }
+                else{
+                    bool Continue = 1;
+                    for(int k = 0; k < 10 && Continue; k++){
+                        if(randInt(0, 1) == 0) Continue = 0;
+                    }
+                    if(Continue) vecPause.push_back((double(i + j)));
+                }
+            }
+        }
+        vecSize = vecPause.size();
+        random_shuffle(vecPause.begin(), vecPause.end());
+    }
+
+    void fly(){
+        int rd = randInt(0, vecSize - 1);
+        double loss = vecPause[rd];
+        double start = 1;
+        long long winMoney = 0;
+
+        while(start <= loss){
+            print();
+
+            cout << "Tien cuoc: " << formMoney(betInt) << endl;
+            cout << "Muc cuoc: " << pause << "x" << endl;
+            cout << "Dang bay: " << start << "x" << endl;
+
+            if(pause <= start){
+                winMoney = betInt * pause;
+            }
+
+            if(start <= 2){
+                start += 0.01;
+                Sleep(0.01);
+            }
+            else if(start <= 5){
+                start += (randInt(0, 1) ? 0.02 : 0.03);
+                Sleep(0.015);
+            }
+            else if(start <= 10){
+                start += (randInt(0, 1) ? 0.11 : 0.12);
+                Sleep(0.02);
+            }
+            else if(start <= 20){
+                start += (randInt(0, 1) ? 0.21 : 0.24);
+                Sleep(0.02);
+            }
+            else if(start <= 50){
+                start += (randInt(0, 1) ? 0.51 : 0.63);
+                Sleep(0.025);
+            }
+            else if(start <= 100){
+                start += (randInt(0, 1) ? 1.21 : 1.38);
+                Sleep(0.02);
+            }
+            else{
+                start += (randInt(0, 1) ? 2.21 : 2.52);
+                Sleep(0.01);
+            }
+        }
+
+        cout << endl;
+
+        if(winMoney > 0){
+            cout << "Dap dat thanh cong!" << endl;
+        }
+        else{
+            cout << "Thu lai nhe!" << endl;
+        }
+
+        cout << "+" << formMoney(winMoney) << endl;
+        curMoney += winMoney;
+
+        cout << "Tu dong lam moi sau 3s." << endl;
+        Sleep(3);
+    }
+
+    void GamePlay(){
+        getPause();
+        quitGame = 0;
+        while(1){
+            print();
+            intro();
+            option();
+            if(quitGame) break;
+            fly();
+        }
+    }
+}
+
+int main(){
+    ios_base::sync_with_stdio(0);
+    cin.tie(0); cout.tie(0);
+
+    while(1){
+        print();
+        chooseNumber();
+        int number; cin >> number;
+
+        switch(number){
+            case 1:
+                Bank::GamePlay();
+                break;
+            case 2:
+                TaiXiu::GamePlay();
+                break;
+            case 3:
+                Jackpot::GamePlay();
+                break;
+            case 4:
+                B52::GamePlay();
+                break;
+            default:
+                return 0;
+        }
+    }
+
+    return 0;
+}
