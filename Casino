@@ -159,7 +159,7 @@ namespace Bank{
         Sleep(3);
     }
 
-    void GamePlay(){
+    void playGame(){
         print();
         intro();
 
@@ -289,7 +289,7 @@ namespace TaiXiu{
         Sleep(3);
     }
 
-    void GamePlay(){
+    void playGame(){
         quitGame = 0;
         while(1){
             print();
@@ -505,7 +505,7 @@ namespace Jackpot{
         if(!Skip) Sleep(3);
     }
 
-    void GamePlay(){
+    void playGame(){
         quitGame = 0;
         Skip = 0;
         while(1){
@@ -660,7 +660,7 @@ namespace B52{
         Sleep(3);
     }
 
-    void GamePlay(){
+    void playGame(){
         getPause();
         quitGame = 0;
         while(1){
@@ -684,16 +684,16 @@ int main(){
 
         switch(number){
             case 1:
-                Bank::GamePlay();
+                Bank::playGame();
                 break;
             case 2:
-                TaiXiu::GamePlay();
+                TaiXiu::playGame();
                 break;
             case 3:
-                Jackpot::GamePlay();
+                Jackpot::playGame();
                 break;
             case 4:
-                B52::GamePlay();
+                B52::playGame();
                 break;
             default:
                 return 0;
